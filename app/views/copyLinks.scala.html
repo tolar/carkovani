@@ -1,0 +1,25 @@
+@(dashboard: DashboardHashes)
+
+<div class="row">
+    <div class="col-md-offset-4 col-md-4 shadow-box padding-15">
+        <span class="viewMode"><span id="viewUrl" class="url">@{dashboard.readonlyHash}</span></span>
+        <span class="scoreMode"><span id="scoreUrl" class="url">@{dashboard.writeHash}</span></span>
+        <span class="viewMode pull-right"><a id="copyViewUrl" href="#">COPY</a></span>
+        <span class="scoreMode pull-right"><a id="copyScoreUrl" href="#">COPY</a></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-offset-4 col-md-4 padding-15">
+        <div class="viewMode">
+            <span>View mode only</span>
+            <span class="pull-right"><a id="showScoreMode" href="#">Score mode (can change score)</a></span>
+        </div>
+        <div class="scoreMode">
+            <span><a id="showViewMode" href="#">View mode only</a></span>
+            <span class="pull-right">Score mode (can change score)</span>
+        </div>
+    </div>
+</div>
+
+<script src='@routes.Assets.at("javascripts/copylinks.js")' type='text/javascript'></script>

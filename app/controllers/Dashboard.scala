@@ -20,11 +20,10 @@ object DashboardFO {
 @SerialVersionUID(1L)
 case class DashboardFO(id: String, name: String, description: String, items: List[ItemFO] = List[ItemFO](),
                        ownerName: String, ownerEmail: String, readonlyHash: String, writeHash: String,
-                       created:DateTime, updated:DateTime, deleted: Boolean = false) extends EntityFieldsObject[String, DashboardFO] {
+                       created:DateTime, updated:DateTime, deleted: Boolean = false) extends EntityFieldsObject[String, DashboardFO] with DashboardHashes {
   override def assignId(id: String) = this.copy(id = id)
 
   override def markDeleted = this.copy(deleted = false)
-  def removeReadOnlyHash = this.copy(readonlyHash = "")
   def removeWriteHash = this.copy(writeHash = "")
   def updatedNow(zone: DateTimeZone) = this.copy(updated = DateTime.now(zone))
   def sortByScore = this.copy(items = List() ++ (items.sortWith((it1, it2) => it1.score > it2.score)))

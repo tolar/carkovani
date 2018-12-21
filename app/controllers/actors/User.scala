@@ -42,7 +42,7 @@ class User (id: String, outActor: ActorRef, dashboardActor: ActorRef, mode: Dash
     case dashboard: DashboardFO =>
       var dashboardUpdated = (mode match {
         case DashboardAccessMode.READONLY => dashboard.removeWriteHash
-        case DashboardAccessMode.WRITE => dashboard.removeReadOnlyHash
+        case DashboardAccessMode.WRITE => dashboard
       })
       dashboardUpdated = sorting match {
         case DashboardSorting.SCORE => dashboardUpdated.sortByScore

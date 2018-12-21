@@ -407,13 +407,13 @@ class Application @Inject() (
       }
       writeDash match {
         case writeRes: DashboardFO =>
-          Some(writeRes.removeReadOnlyHash, DashboardAccessMode.WRITE)
+          Some(writeRes, DashboardAccessMode.WRITE)
         case writeRes: FullResult[_] =>
           writeRes.value match {
             case List(item) =>
               item match {
-                case dashboard: DashboardFO => Some(dashboard.removeReadOnlyHash, DashboardAccessMode.WRITE)
-                case jsObject: JObject => Some(jsObject.extract[DashboardFO].removeReadOnlyHash, DashboardAccessMode.WRITE)
+                case dashboard: DashboardFO => Some(dashboard, DashboardAccessMode.WRITE)
+                case jsObject: JObject => Some(jsObject.extract[DashboardFO], DashboardAccessMode.WRITE)
                 case _ => maybeReadDashboard
               }
             case _ => maybeReadDashboard
