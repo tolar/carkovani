@@ -1,5 +1,8 @@
-$(".viewMode").show();
-$(".scoreMode").hide();
+$(function () {
+    $('#copyViewUrl').popover();
+    $('#copyScoreUrl').popover();
+})
+
 $("span.url").each(function () {
     $(this).text(location.origin + "/dashboard/" + $(this).text());
 });
@@ -18,16 +21,29 @@ $("#showViewMode").click(
         $(".scoreMode").hide();
     }
 );
+
 $("#copyScoreUrl").click(
     function () {
-        copyToClipboard($("#scoreUrl").get(0))
+        copyToClipboard($("#scoreUrl").get(0));
+        $("#copyScoreUrl").popover('show');
+        setTimeout(function () {
+                $("#copyScoreUrl").popover('hide');
+            }, 3000)
     }
 );
+
+
 $("#copyViewUrl").click(
     function () {
-        copyToClipboard($("#viewUrl").get(0))
+        copyToClipboard($("#viewUrl").get(0));
+        $("#copyViewUrl").popover('show');
+        setTimeout(function () {
+            $("#copyViewUrl").popover('hide');
+            }, 3000)
     }
 );
+
+
 
 copyToClipboard = function (elem) {
     // create hidden text element, if it doesn't already exist

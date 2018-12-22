@@ -171,7 +171,7 @@ class Application @Inject() (
           )).mapTo[FullResult[DashboardFO]].map {
           r => {
             dashboardViewBuilder ? DashboardCreated(r.value)
-            Ok(views.html.createdDashboard(Forms.CreatedDashboard(r.value.name, r.value.writeHash, r.value.readonlyHash))).withNewSession
+            Ok(views.html.dashboard(r.value)).withNewSession.flashing("message" -> "Dashboard was created!")
           }
         }
       }
