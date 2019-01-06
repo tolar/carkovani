@@ -2,9 +2,11 @@ window.currentDashboardType = 'COMMA'
 
 window.initRecent = () ->
   $("#recent-dashboards-section").css "display", "none"
+  $("#monitor-preview-section").css "display", "none"
   hashes = localStorage.getItem("hashes");
   if hashes == null
     hashesArr = []
+    $("#monitor-preview-section").css "display", "block"
   else
     hashesArr = JSON.parse(hashes)
     $.ajax '/dashboardsData/' + hashesArr,
@@ -21,8 +23,13 @@ window.initRecent = () ->
           anchor = $("<a>", {href: window.location.href + "dashboard/" + hash}).html(dashboard.name + " - " + dashboard.description + " " + suffix)
           div = $("<div>").append(anchor)
           $("#recent-dashboards").append(div)
+        if dashboards.length > 0
           $("#recent-dashboards-section").css "display", "block"
           $("#monitor-preview-section").css "display", "none"
+        else
+          $("#recent-dashboards-section").css "display", "none"
+          $("#monitor-preview-section").css "display", "block"
+
 
 
 
@@ -78,7 +85,7 @@ $ ->
     $("#commas").empty()
     for item in dashboard.items
       itemRow = $("<div>").addClass("item row dashboard-comma-row")
-      itemRow.append($("<div>").addClass("col-md-2 vertical-center").text(item.name))
+      itemRow.append($("<div>").addClass("col-md-2 vertical-center").attr("style", "word-break:break-word").text(item.name))
 
       buttonArea = $("<div>").addClass("col-md-2 buttons-area vertical-center")
 
@@ -127,8 +134,8 @@ $ ->
     $("#chart-canvas").remove()
     canvas = $("<canvas>")
       .attr("id", "chart-canvas")
-      .attr("width", 250)
-      .attr("height", 250)
+#      .attr("width", 500)
+#      .attr("height", 500)
     $("#chart").append(canvas)
 
     scoreArray = []
@@ -152,7 +159,7 @@ $ ->
         animation: {
           duration: 0
         },
-        responsive: false,
+        responsive: true,
         legend: {
           position: "bottom"
         }
