@@ -32,7 +32,6 @@ case class DashboardFO(id: String, name: String, description: String, items: Lis
   def applyAccessMode(mode: DashboardAccessMode.Value) = {
     mode match {
       case DashboardAccessMode.READONLY => this.removeWriteHash
-      case DashboardAccessMode.WRITE => this.removeReadOnlyHash
     }
   }
 }
