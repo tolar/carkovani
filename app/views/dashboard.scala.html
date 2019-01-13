@@ -2,6 +2,14 @@
 
 @mainBasic("ScoDash") {
 
+    @if(!request.flash.get("message").isEmpty) {
+        <div class="row green-message vertical-align">
+            <div class="col-md-12 text-center">
+                <span><img src="@routes.Assets.at("images/icon-check-white.png")"/>&nbsp;@request.flash.get("message")</span>
+            </div>
+        </div>
+    }
+
     <div class="row bottom-border">
         <div class="row">
             <div class="col-md-12 text-center"><h2>@{
@@ -49,12 +57,22 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12 footer">
-            <div class="text-center">Dashboard <b>@dashboard.name</b> created by <b>@dashboard.ownerName</b> on <span id="created">@dashboard.created</span></div>
-            <div class="text-center">Last update at <span id="updated">@dashboard.updated</span></div>
+    <div class="row footer">
+        <div class="col-md-4 col-md-offset-1">
+            <div>Dashboard <b>@dashboard.name</b> created by <b>@dashboard.ownerName</b> on <span id="created">@dashboard.created</span></div>
+            <div>Last update at <span id="updated">@dashboard.updated</span></div>
         </div>
+
+        <div class="col-md-4 col-md-offset-2">
+            <div style="margin-bottom: 3px;">
+                <img src="@routes.Assets.at("images/icon-share.png")"/>
+                <span><strong>&nbsp;&nbsp;Share&nbsp;this&nbsp;dashboard</strong></span>
+            </div>
+            @copyLinks(dashboard)
+        </div>
+
     </div>
+
 
     <script language="JavaScript">
         var hashes = localStorage.getItem("hashes");

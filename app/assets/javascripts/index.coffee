@@ -16,7 +16,7 @@ window.initRecent = () ->
         i = 0
         for dashboard in dashboards
           hash = dashboard.readonlyHash
-          suffix = "(readonly)"
+          suffix = "(view-only)"
           if !!dashboard.writeHash
             hash = dashboard.writeHash
             suffix = ""

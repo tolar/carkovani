@@ -13,7 +13,7 @@ object Forms {
 
   case class Item(itemName: String)
 
-  case class CreatedDashboard(name: String, writeHash: String, readOnlyHash: String) {
+  case class CreatedDashboard(name: String, writeHash: String, readonlyHash: String) extends DashboardHashes {
     def this() = this("","","")
   }
 

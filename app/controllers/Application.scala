@@ -9,7 +9,6 @@ import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import controllers.Dashboard.Event.DashboardCreated
 import controllers.Forms.CreateDashboardItems
 import controllers.actors.Scodash.Command.CreateNewDashboard
 import controllers.actors.{DashboardAccessMode, Scodash}
@@ -26,8 +25,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.mvc._
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 class Application @Inject() (
                               cc: MessagesControllerComponents,
@@ -170,8 +169,7 @@ class Application @Inject() (
           DateTimeZone.forOffsetHours(Integer.valueOf(ownerData.tzOffset)/60)
           )).mapTo[FullResult[DashboardFO]].map {
           r => {
-            dashboardViewBuilder ? DashboardCreated(r.value)
-            Ok(views.html.createdDashboard(Forms.CreatedDashboard(r.value.name, r.value.writeHash, r.value.readonlyHash))).withNewSession
+            Ok(views.html.dashboard(r.value)).withNewSession.flashing("message" -> "Dashboard was created!")
           }
         }
       }
@@ -371,52 +369,58 @@ class Application @Inject() (
     var writeFut = scodashActor ? Scodash.Command.FindDashboardByWriteHash(hash)
     var readFut = scodashActor ? Scodash.Command.FindDashboardByReadonlyHash(hash)
 
-    var dashboard = resolveOneDashboard(writeFut, readFut)
-    dashboard.map {
+    var dashboard = resolveDashboard(writeFut, readFut)
+    dashboard.flatMap {
       case Some((dashboard, mode)) => {
-        logger.info("Found {} dashboard in maps", hash)
-        Some((dashboard, mode))
+        logger.info("Found {} dashboard in maps", (hash, mode))
+        Future(Some((dashboard, mode)))
       }
       case None => {
         logger.info("Not found {} dashboard in maps - going to read model", hash)
         writeFut = dashboardViewActor ? Scodash.Command.FindDashboardByWriteHash(hash)
         readFut = dashboardViewActor ? Scodash.Command.FindDashboardByReadonlyHash(hash)
-        Await.result(resolveOneDashboard(writeFut, readFut), 10 seconds)
+        resolveDashboard(writeFut, readFut)
       }
     }
+
   }
 
-  private def resolveDashboard(dash: Any, accessMode: DashboardAccessMode.Value): Option[(DashboardFO, DashboardAccessMode.Value)] = {
-    dash match {
-      case dash: DashboardFO =>
-        Some(dash.removeWriteHash, accessMode)
-      case dash: FullResult[_] =>
-        dash.value match {
-          case List(item) =>
-            item match {
-              case item: DashboardFO => Some(item.applyAccessMode(accessMode), accessMode)
-              case jsObject: JObject => Some(jsObject.extract[DashboardFO].applyAccessMode(accessMode), accessMode)
-            }
-          case value: DashboardFO =>
-            Some(value.applyAccessMode(accessMode), accessMode)
-          case _ => None
-        }
-      case _ => None
-    }
-  }
-
-  private def resolveOneDashboard(writeFut: Future[Any], readFut: Future[Any]): Future[Option[(DashboardFO, DashboardAccessMode.Value)]] = {
+  private def resolveDashboard(writeFut: Future[Any], readFut: Future[Any]): Future[Option[(DashboardFO, DashboardAccessMode.Value)]] = {
     for {
       writeDash <- writeFut
       readDash <- readFut
     } yield {
-      val writeDashResolved = resolveDashboard(writeDash, DashboardAccessMode.WRITE)
-      val readDashResolved = resolveDashboard(readDash, DashboardAccessMode.READONLY)
-      writeDashResolved match {
-        case Some(dash) => writeDashResolved
-        case _ => readDashResolved
+      val maybeReadDashboard = readDash match {
+        case readRes: DashboardFO =>
+          Some(readRes.removeWriteHash, DashboardAccessMode.READONLY)
+        case readRes: FullResult[_] =>
+          readRes.value match {
+            case item: DashboardFO => Some(item.removeWriteHash, DashboardAccessMode.READONLY)
+            case List(item) =>
+              item match {
+                case item: DashboardFO => Some(item.removeWriteHash, DashboardAccessMode.READONLY)
+                case jsObject: JObject => Some(jsObject.extract[DashboardFO].removeWriteHash, DashboardAccessMode.READONLY)
+              }
+            case _ => None
+          }
+        case _ => None
+      }
+      writeDash match {
+        case writeRes: DashboardFO =>
+          Some(writeRes, DashboardAccessMode.WRITE)
+        case writeRes: FullResult[_] =>
+          writeRes.value match {
+            case dashboard: DashboardFO => Some(dashboard, DashboardAccessMode.WRITE)
+            case List(item) =>
+              item match {
+
+                case jsObject: JObject => Some(jsObject.extract[DashboardFO], DashboardAccessMode.WRITE)
+                case _ => maybeReadDashboard
+              }
+            case _ => maybeReadDashboard
+          }
+        case _ => maybeReadDashboard
       }
     }
   }
-
 }
