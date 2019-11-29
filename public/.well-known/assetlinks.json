@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.scodash.android",
+    "sha256_cert_fingerprints":
+    ["2E:27:6A:22:12:E9:8C:D1:E2:9C:49:77:DE:35:D1:E1:7D:19:1E:E7:27:89:C2:FB:10:DF:BB:E8:02:80:6B:ED"]
+  }
+}]
