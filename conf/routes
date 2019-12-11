@@ -13,6 +13,7 @@ POST        /addItem                    controllers.Application.addItem
 POST        /removeItem                 controllers.Application.removeItem
 GET         /showDashboardOwner         controllers.Application.showDashboardOwner
 POST        /processDashboardOwner      controllers.Application.processDashboardOwner
+GET         /rest/dashboard/:hash       controllers.Application.restGetDashboard(hash)
 
 
 # Map static resources from the /public folder to the /assets URL path
