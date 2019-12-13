@@ -423,4 +423,15 @@ class Application @Inject() (
       }
     }
   }
+
+
+  def restGetDashboard(hash: String) = Action.async { implicit request =>
+    getDashboard(hash).flatMap{
+      case Some((dashboard, accessMode)) =>
+        Future(Ok(write(dashboard)))
+      case _ =>
+        Future(NotFound("Dashobard not found."))
+    }
+  }
+
 }
