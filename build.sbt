@@ -23,9 +23,6 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.0.9",
   "com.typesafe.slick" %% "slick" % "3.1.1",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
-//  "net.databinder" %% "unfiltered-filter" % "0.8.4",
-//  "net.databinder" %% "unfiltered-netty" % "0.8.4",
-//  "net.databinder" %% "unfiltered-netty-server" % "0.8.4",
   "net.databinder" %% "unfiltered-json4s" % "0.8.4",
   "org.json4s" %% "json4s-ext" % json4sVersion,
   "org.json4s" %% "json4s-jackson" % json4sVersion,
@@ -33,7 +30,10 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1208",
   "com.google.protobuf" % "protobuf-java"  % "2.5.0",
   "org.apache.commons" % "commons-lang3" % "3.7",
-  "com.sendgrid" % "sendgrid-java" % "4.0.1"
+  "com.sendgrid" % "sendgrid-java" % "4.0.1",
+  "com.pauldijou" %% "jwt-play" % "0.19.0",
+  "com.pauldijou" %% "jwt-core" % "0.19.0",
+  "com.auth0" % "jwks-rsa" % "0.6.1"
 )
 
 libraryDependencies += "org.webjars" % "jquery" % "3.2.1"
