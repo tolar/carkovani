@@ -7,6 +7,7 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
+import auth.AuthAction
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import controllers.Forms.CreateDashboardItems
@@ -25,11 +26,12 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.mvc._
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 class Application @Inject() (
                               cc: MessagesControllerComponents,
+                              authAction: AuthAction,
                               @Named(Scodash.Name) scodashActor: ActorRef,
                               @Named(DashboardView.Name) dashboardViewActor: ActorRef,
                               @Named(DashboardViewBuilder.Name) dashboardViewBuilder: ActorRef,
@@ -425,13 +427,14 @@ class Application @Inject() (
   }
 
 
-  def restGetDashboard(hash: String) = Action.async { implicit request =>
-    getDashboard(hash).flatMap{
+  def restGetDashboard(hash: String) = authAction { implicit request =>
+    Await.result(getDashboard(hash), Duration.Inf) match {
       case Some((dashboard, accessMode)) =>
-        Future(Ok(write(dashboard)))
+        Ok(write(dashboard))
       case _ =>
-        Future(NotFound("Dashobard not found."))
+        NotFound("Dashobard not found.")
     }
+
   }
 
 }
