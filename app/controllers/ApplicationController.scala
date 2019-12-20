@@ -28,7 +28,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class Application @Inject() (
+class ApplicationController @Inject() (
                               cc: MessagesControllerComponents,
                               @Named(Scodash.Name) scodashActor: ActorRef,
                               @Named(DashboardView.Name) dashboardViewActor: ActorRef,

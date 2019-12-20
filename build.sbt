@@ -36,6 +36,11 @@ libraryDependencies ++= Seq(
   "com.sendgrid" % "sendgrid-java" % "4.0.1"
 )
 
+libraryDependencies ++= Seq(
+  "com.nulab-inc" %% "scala-oauth2-core" % "1.3.0",
+  "com.nulab-inc" %% "play2-oauth2-provider" % "1.3.0"
+)
+
 libraryDependencies += "org.webjars" % "jquery" % "3.2.1"
 
 libraryDependencies += "org.webjars" % "bootstrap" % "3.3.7"
