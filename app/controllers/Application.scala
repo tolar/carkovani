@@ -7,9 +7,9 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
-import auth.AuthAction
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import com.mohiva.play.silhouette.api.Silhouette
 import controllers.Forms.CreateDashboardItems
 import controllers.actors.Scodash.Command.CreateNewDashboard
 import controllers.actors.{DashboardAccessMode, Scodash}
@@ -25,13 +25,14 @@ import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.mvc._
+import utils.auth.DefaultEnv
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 class Application @Inject() (
                               cc: MessagesControllerComponents,
-                              authAction: AuthAction,
+                              silhouette: Silhouette[DefaultEnv],
                               @Named(Scodash.Name) scodashActor: ActorRef,
                               @Named(DashboardView.Name) dashboardViewActor: ActorRef,
                               @Named(DashboardViewBuilder.Name) dashboardViewBuilder: ActorRef,
@@ -427,7 +428,7 @@ class Application @Inject() (
   }
 
 
-  def restGetDashboard(hash: String) = authAction { implicit request =>
+  def restGetDashboard(hash: String) = silhouette.SecuredAction {
     Await.result(getDashboard(hash), Duration.Inf) match {
       case Some((dashboard, accessMode)) =>
         Ok(write(dashboard))
