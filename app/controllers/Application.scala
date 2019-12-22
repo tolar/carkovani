@@ -32,7 +32,7 @@ import scala.concurrent.duration._
 
 class Application @Inject() (
                               cc: MessagesControllerComponents,
-                              silhouette: Silhouette[DefaultEnv],
+                              /*silhouette: Silhouette[DefaultEnv],*/
                               @Named(Scodash.Name) scodashActor: ActorRef,
                               @Named(DashboardView.Name) dashboardViewActor: ActorRef,
                               @Named(DashboardViewBuilder.Name) dashboardViewBuilder: ActorRef,
@@ -428,7 +428,7 @@ class Application @Inject() (
   }
 
 
-  def restGetDashboard(hash: String) = silhouette.SecuredAction {
+  def restGetDashboard(hash: String) = Action {
     Await.result(getDashboard(hash), Duration.Inf) match {
       case Some((dashboard, accessMode)) =>
         Ok(write(dashboard))
