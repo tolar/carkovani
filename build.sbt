@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-  "com.typesafe.akka" %% "akka-http" % "10.1.0",
+  //"com.typesafe.akka" %% "akka-http" % "10.1.0",
   "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion excludeAll(ExclusionRule("io.netty")),
   "com.typesafe.akka" %% "akka-persistence" % akkaVersion excludeAll(ExclusionRule("io.netty")),
   "ch.qos.logback" % "logback-classic" % "1.0.9",
@@ -32,11 +32,11 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.7",
   "com.sendgrid" % "sendgrid-java" % "4.0.1",
   // Silhouette dependencies
-  "com.mohiva" %% "play-silhouette" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.5",
-  "com.mohiva" %% "play-silhouette-persistence" % "5.0.5",
-  // use scala syntax on guice vs java
+  "com.mohiva" %% "play-silhouette" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.7",
+//  // use scala syntax on guice vs java
   "net.codingwell" %% "scala-guice" % "4.2.1"
 )
 

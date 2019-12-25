@@ -1,5 +1,6 @@
 package utils.auth
 
+
 import java.util.UUID
 
 import com.mohiva.play.silhouette.api.services.IdentityService

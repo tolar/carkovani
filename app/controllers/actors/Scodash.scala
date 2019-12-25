@@ -19,7 +19,8 @@ object Scodash {
     case class FindDashboard(id: String)
     case class FindDashboardByWriteHash(hash: String)
     case class FindDashboardByReadonlyHash(hash: String)
-    case class CreateNewDashboard(name: String, description: String, items: Set[ItemFO] = Set(), ownerName: String, ownerEmail: String, timeZone: DateTimeZone)
+    case class CreateNewDashboardWithTz(name: String, description: String, items: Set[ItemFO] = Set(), ownerName: String, ownerEmail: String, timeZone: DateTimeZone)
+    case class CreateNewDashboardWithCreated(name: String, description: String, items: Set[ItemFO] = Set(), ownerName: String, ownerEmail: String, created: DateTime)
     case class CreateDashboardUser(userId: String, webOutActor: ActorRef, dashboardId: String, mode: DashboardAccessMode.Value)
   }
 
@@ -62,18 +63,19 @@ class Scodash extends Aggregate[DashboardFO, Dashboard] {
         case None => sender ! None
       }
 
-    case CreateNewDashboard(name, description, items, ownerName, ownerEmail, dateTimeZone) =>
+    case CreateNewDashboardWithTz(name, description, items, ownerName, ownerEmail, dateTimeZone) =>
 
-      log.info("Creating new dashboard with name {}", name)
-
-      val id = UUID.randomUUID().toString
-      val readonlyHash = RandomStringUtils.randomAlphanumeric(8)
-      val writeHash = RandomStringUtils.randomAlphanumeric(8)
-
-      readOnlyIds(readonlyHash) = id
-      writeIds(writeHash) = id
+      val (id: String, readonlyHash: String, writeHash: String) = createHashes()
 
       val fo = DashboardFO(id, name, description, List() ++ items, ownerName, ownerEmail, readonlyHash, writeHash, DateTime.now(dateTimeZone), DateTime.now(dateTimeZone))
+      val command = CreateDashboard(fo)
+      forwardCommand(id, command)
+
+    case CreateNewDashboardWithCreated(name, description, items, ownerName, ownerEmail, created) =>
+
+      val (id: String, readonlyHash: String, writeHash: String) = createHashes()
+
+      val fo = DashboardFO(id, name, description, List() ++ items, ownerName, ownerEmail, readonlyHash, writeHash, created, created)
       val command = CreateDashboard(fo)
       forwardCommand(id, command)
 
@@ -83,6 +85,17 @@ class Scodash extends Aggregate[DashboardFO, Dashboard] {
       forwardCommand(dashboardId, Dashboard.Command.Watch(user))
       sender ! user
 
+  }
+
+  private def createHashes() = {
+
+    val id = UUID.randomUUID().toString
+    val readonlyHash = RandomStringUtils.randomAlphanumeric(8)
+    val writeHash = RandomStringUtils.randomAlphanumeric(8)
+
+    readOnlyIds(readonlyHash) = id
+    writeIds(writeHash) = id
+    (id, readonlyHash, writeHash)
   }
 
   def entityProps(id: String) = Dashboard.props(id)
