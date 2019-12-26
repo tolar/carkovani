@@ -7,16 +7,16 @@ import akka.pattern.ask
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
-import auth.AuthAction
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import com.mohiva.play.silhouette.api.Silhouette
 import controllers.Forms.CreateDashboardItems
-import controllers.actors.Scodash.Command.CreateNewDashboard
+import controllers.actors.Scodash.Command.{CreateNewDashboardWithCreated, CreateNewDashboardWithTz}
 import controllers.actors.{DashboardAccessMode, Scodash}
 import org.apache.commons.lang3.StringUtils
 import org.joda.time.DateTimeZone
 import org.json4s.ext.JodaTimeSerializers
-import org.json4s.native.Serialization.write
+import org.json4s.native.Serialization.{read, write}
 import org.json4s.native._
 import org.json4s.{DefaultFormats, _}
 import org.reactivestreams.Publisher
@@ -25,13 +25,14 @@ import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.mvc._
+import utils.auth.DefaultEnv
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 class Application @Inject() (
                               cc: MessagesControllerComponents,
-                              authAction: AuthAction,
+                              silhouette: Silhouette[DefaultEnv],
                               @Named(Scodash.Name) scodashActor: ActorRef,
                               @Named(DashboardView.Name) dashboardViewActor: ActorRef,
                               @Named(DashboardViewBuilder.Name) dashboardViewBuilder: ActorRef,
@@ -46,8 +47,6 @@ class Application @Inject() (
 
   implicit val timeout: Timeout = 5.seconds
   implicit lazy val formats = DefaultFormats ++ JodaTimeSerializers.all
-//  implicit private val ItemWrites = Json.writes[ItemFO]
-//  implicit private val DashoboardWrites = Json.writes[DashboardFO]
 
 
   def index() = Action {
@@ -162,7 +161,7 @@ class Application @Inject() (
       },
       ownerData => {
         val sessDash = JsonMethods.parse(request.session.get(SESSION_DASHBOARD).get).extract[Forms.Dashboard]
-        (scodashActor ? CreateNewDashboard(
+        (scodashActor ? CreateNewDashboardWithTz(
           sessDash.name,
           sessDash.description,
           sessDash.items.zipWithIndex.map { case (name, id) => ItemFO(id, name) } ,
@@ -427,7 +426,7 @@ class Application @Inject() (
   }
 
 
-  def restGetDashboard(hash: String) = authAction { implicit request =>
+  def restGetDashboard(hash: String) = silhouette.SecuredAction {
     Await.result(getDashboard(hash), Duration.Inf) match {
       case Some((dashboard, accessMode)) =>
         Ok(write(dashboard))
@@ -435,6 +434,33 @@ class Application @Inject() (
         NotFound("Dashobard not found.")
     }
 
+  }
+
+  private def createDashboard(dashboard: DashboardFO) = {
+    scodashActor ? CreateNewDashboardWithCreated(
+      dashboard.name,
+      dashboard.description,
+      Set() ++ dashboard.items,
+      dashboard.ownerName,
+      dashboard.ownerEmail,
+      dashboard.created
+    )
+  }
+
+
+  def restPostDashboard() = silhouette.SecuredAction { implicit request =>
+    val jsonOpt:Option[JsValue] = request.body.asJson
+    jsonOpt match {
+      case Some(json) => {
+        val dashboard = read[DashboardFO](json.toString())
+        Await.result(createDashboard(dashboard), Duration.Inf) match {
+          case fr:FullResult[DashboardFO] => {
+            Ok(write(fr.value)).as(JSON)
+          }
+        }
+      }
+      case _ => InternalServerError
+    }
   }
 
 }

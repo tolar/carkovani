@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-  "com.typesafe.akka" %% "akka-http" % "10.1.0",
+  //"com.typesafe.akka" %% "akka-http" % "10.1.0",
   "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion excludeAll(ExclusionRule("io.netty")),
   "com.typesafe.akka" %% "akka-persistence" % akkaVersion excludeAll(ExclusionRule("io.netty")),
   "ch.qos.logback" % "logback-classic" % "1.0.9",
@@ -31,9 +31,13 @@ libraryDependencies ++= Seq(
   "com.google.protobuf" % "protobuf-java"  % "2.5.0",
   "org.apache.commons" % "commons-lang3" % "3.7",
   "com.sendgrid" % "sendgrid-java" % "4.0.1",
-  "com.pauldijou" %% "jwt-play" % "0.19.0",
-  "com.pauldijou" %% "jwt-core" % "0.19.0",
-  "com.auth0" % "jwks-rsa" % "0.6.1"
+  // Silhouette dependencies
+  "com.mohiva" %% "play-silhouette" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.7",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.7",
+//  // use scala syntax on guice vs java
+  "net.codingwell" %% "scala-guice" % "4.2.1"
 )
 
 libraryDependencies += "org.webjars" % "jquery" % "3.2.1"
@@ -47,4 +51,9 @@ libraryDependencies += "org.apache.commons" % "commons-collections4" % "4.1"
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"  
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
+resolvers ++= Seq (
+  Resolver.jcenterRepo,
+  "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+)
