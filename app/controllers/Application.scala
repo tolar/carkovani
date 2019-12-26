@@ -455,7 +455,7 @@ class Application @Inject() (
         val dashboard = read[DashboardFO](json.toString())
         Await.result(createDashboard(dashboard), Duration.Inf) match {
           case fr:FullResult[DashboardFO] => {
-            Ok(write(fr.value))
+            Ok(write(fr.value)).as(JSON)
           }
         }
       }
