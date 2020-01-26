@@ -13,11 +13,13 @@ POST        /addItem                    controllers.Application.addItem
 POST        /removeItem                 controllers.Application.removeItem
 GET         /showDashboardOwner         controllers.Application.showDashboardOwner
 POST        /processDashboardOwner      controllers.Application.processDashboardOwner
+
+# REST API for mobile application
 GET         /rest/dashboard/:hash       controllers.Application.restGetDashboard(hash)
 POST        /rest/dashboard             controllers.Application.restPostDashboard
 
-
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file               controllers.Assets.at(path="/public", file)
-GET         /.well-known/assetlinks.json    controllers.Assets.at(path="/public", file="well-known/assetlinks.json")
+GET         /.well-known/assetlinks.json controllers.Assets.at(path="/public", file="well-known/assetlinks.json")
+GET         /legal/privacy-policy       controllers.Assets.at(path="/public", file="legal/privacy-policy.html")
 
