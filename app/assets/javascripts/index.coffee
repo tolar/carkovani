@@ -21,8 +21,27 @@ window.initRecent = () ->
             hash = dashboard.writeHash
             suffix = ""
           anchor = $("<a>", {href: window.location.href + "dashboard/" + hash}).html(dashboard.name + " - " + dashboard.description + " " + suffix)
-          div = $("<div>").append(anchor)
-          $("#recent-dashboards").append(div)
+          tdAnchor = $("<td>").append(anchor)
+          btn = $("<button>", {type: "button"})
+          btn.attr("data-toggle", "tooltip")
+          btn.attr("data-placement", "right")
+          btn.attr("title", "Remove dashboard from recents")
+          btn.addClass("btn btn-default btn-xs").append($("<span>").addClass("glyphicon glyphicon-remove"))
+          tdBtn = $("<td>").append(btn)
+          tdBtn.addClass("padding-5")
+          tr = $("<tr>").append(tdAnchor).append(tdBtn)
+          btn.click
+            data: {hash: hash, trClicked: tr}
+            handler: (event) ->
+              hashes = localStorage.getItem("hashes");
+              hashesArr = JSON.parse(hashes)
+              hashesArr.splice(hashesArr.indexOf(event.data.hash), 1)
+              if hashesArr.length > 0
+                localStorage.setItem("hashes", JSON.stringify(hashesArr))
+              else
+                localStorage.removeItem("hashes")
+              event.data.trClicked.remove()
+          $("#recent-dashboards").append(tr)
         if dashboards.length > 0
           $("#recent-dashboards-section").css "display", "block"
           $("#monitor-preview-section").css "display", "none"
