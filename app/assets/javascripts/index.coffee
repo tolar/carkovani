@@ -36,7 +36,10 @@ window.initRecent = () ->
               hashes = localStorage.getItem("hashes");
               hashesArr = JSON.parse(hashes)
               hashesArr.splice(hashesArr.indexOf(event.data.hash), 1)
-              localStorage.setItem("hashes", JSON.stringify(hashesArr))
+              if hashesArr.length > 0
+                localStorage.setItem("hashes", JSON.stringify(hashesArr))
+              else
+                localStorage.removeItem("hashes")
               event.data.trClicked.remove()
           $("#recent-dashboards").append(tr)
         if dashboards.length > 0
